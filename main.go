@@ -68,6 +68,12 @@ usage:
 flow:
   1. awsso configure          (one time)
   2. awsso                    pick account -> role -> EKS cluster
+
+first time setup:
+  awsso configure \
+    --start-url https://<d-xxxxxx>.awsapps.com/start \
+    --sso-region eu-central-1 \
+    --eks-region eu-south-2
 `)
 }
 
@@ -148,7 +154,12 @@ func promptIfEmpty(label, current, suggestion string) string {
 func runLogin(ctx context.Context) error {
 	cfg, err := config.Load()
 	if err != nil {
-		return fmt.Errorf("not configured: run `awsso configure` first (%w)", err)
+		fmt.Fprintln(os.Stderr, "not configured. Run:\n")
+		fmt.Fprintln(os.Stderr, "  awsso configure \\")
+		fmt.Fprintln(os.Stderr, "    --start-url https://<d-xxxxxx>.awsapps.com/start \\")
+		fmt.Fprintln(os.Stderr, "    --sso-region eu-central-1 \\")
+		fmt.Fprintln(os.Stderr, "    --eks-region eu-south-2")
+		os.Exit(1)
 	}
 
 	// 1. SSO device flow (with token cache reuse).
